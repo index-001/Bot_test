@@ -1,3 +1,4 @@
+import os
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 import requests
@@ -23,9 +24,15 @@ async def recibir(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         await update.message.reply_text("Formato incorrecto. Usa: Nombre, Correo, Mensaje")
 
-# Crear el bot
-app = ApplicationBuilder().token("8533267780:AAEG2DPjcpcyP0qEhgjU5lMITLVSJIBnrfY").build()
+# Crear el bot usando variable de entorno
+token = os.environ.get("TELEGRAM_TOKEN")
+if not token:
+    raise ValueError("No se encontró la variable de entorno TELEGRAM_TOKEN")
+
+app = ApplicationBuilder().token(token).build()
 app.add_handler(CommandHandler("start", start))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, recibir))
 
+# Ejecutar el bot
 app.run_polling()
+
